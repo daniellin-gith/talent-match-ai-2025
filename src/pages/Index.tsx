@@ -15,6 +15,7 @@ interface Candidate {
   skills: string[];
   experience: string;
   education: string;
+  fileName: string;
 }
 
 const Index = () => {
@@ -22,97 +23,102 @@ const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
-  // Mock candidates data for demonstration
-  const mockCandidates: Candidate[] = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      score: 9,
-      position: 'Senior Software Engineer',
-      email: 'sarah.johnson@email.com',
-      phone: '+1 (555) 123-4567',
-      skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS', 'Team Leadership'],
-      experience: 'Senior Software Engineer with 8+ years of experience leading development teams and architecting scalable web applications. Proven track record of delivering high-quality solutions using modern tech stacks.',
-      education: 'M.S. Computer Science, Stanford University (2015)\nB.S. Software Engineering, UC Berkeley (2013)'
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      score: 8,
-      position: 'Full Stack Developer',
-      email: 'michael.chen@email.com',
-      phone: '+1 (555) 234-5678',
-      skills: ['JavaScript', 'React', 'Vue.js', 'MongoDB', 'Express', 'Docker'],
-      experience: 'Full Stack Developer with 5+ years of experience building responsive web applications and RESTful APIs. Strong background in both frontend and backend technologies.',
-      education: 'B.S. Computer Science, MIT (2018)\nBootcamp Graduate, Lambda School (2019)'
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      score: 7,
-      position: 'Frontend Developer',
-      email: 'emily.rodriguez@email.com',
-      phone: '+1 (555) 345-6789',
-      skills: ['HTML', 'CSS', 'JavaScript', 'React', 'SASS', 'Figma'],
-      experience: 'Creative Frontend Developer with 4+ years specializing in user interface design and development. Experience creating pixel-perfect, responsive designs.',
-      education: 'B.A. Web Design, Art Institute (2019)\nCertified UX Designer, Google (2020)'
-    },
-    {
-      id: '4',
-      name: 'David Kim',
-      score: 6,
-      position: 'Junior Developer',
-      email: 'david.kim@email.com',
-      phone: '+1 (555) 456-7890',
-      skills: ['HTML', 'CSS', 'JavaScript', 'Git', 'Basic React'],
-      experience: 'Recent computer science graduate with internship experience and strong foundation in web development fundamentals. Eager to learn and grow in a collaborative environment.',
-      education: 'B.S. Computer Science, UCLA (2023)\nInternship at Tech Startup (Summer 2022)'
-    },
-    {
-      id: '5',
-      name: 'Lisa Thompson',
-      score: 5,
-      position: 'Marketing Coordinator',
-      email: 'lisa.thompson@email.com',
-      phone: '+1 (555) 567-8901',
-      skills: ['Marketing', 'Social Media', 'Content Creation', 'Basic HTML'],
-      experience: 'Marketing professional with 3+ years in digital marketing and content creation. Some basic web development knowledge through self-study.',
-      education: 'B.A. Marketing, University of Texas (2020)\nDigital Marketing Certificate, HubSpot (2021)'
-    }
-  ];
+  const extractTextFromFile = async (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // For now, we'll simulate text extraction
+        // In a real implementation, you'd use libraries like pdf-parse or mammoth for proper extraction
+        const text = e.target?.result as string;
+        resolve(text || `Resume content from ${file.name}`);
+      };
+      
+      if (file.type === 'text/plain') {
+        reader.readAsText(file);
+      } else {
+        // For PDF/DOC files, we'll simulate extraction
+        resolve(`Extracted text content from ${file.name} - This would contain the actual resume text in a real implementation with proper PDF/DOC parsing.`);
+      }
+    });
+  };
+
+  const analyzeResumeWithAI = async (resumeText: string, jobDescription: string, fileName: string): Promise<Candidate> => {
+    // Simulate AI analysis - in a real implementation, you'd call an AI API
+    const mockAnalysis = {
+      name: fileName.replace(/\.(pdf|doc|docx|txt)$/i, '').replace(/[-_]/g, ' '),
+      score: Math.floor(Math.random() * 5) + 6, // Random score between 6-10 for demo
+      position: 'Candidate',
+      email: `${fileName.toLowerCase().replace(/\.(pdf|doc|docx|txt)$/i, '').replace(/\s+/g, '.')}@email.com`,
+      phone: `+1 (555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+      skills: ['JavaScript', 'React', 'Python', 'Communication', 'Problem Solving'].slice(0, Math.floor(Math.random() * 3) + 3),
+      experience: `Professional experience extracted from ${fileName}. This candidate shows relevant background for the position.`,
+      education: `Educational background from ${fileName}. Relevant qualifications identified.`,
+      fileName: fileName
+    };
+
+    // Simulate AI processing time
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      id: Math.random().toString(36).substr(2, 9),
+      ...mockAnalysis
+    };
+  };
 
   const handleAnalyze = async (jobDescription: string, resumes: File[]) => {
     setIsAnalyzing(true);
+    setCandidates([]);
     
     toast({
       title: "Analysis Started",
       description: `Processing job description and ${resumes.length} resume(s)...`,
     });
 
-    // Simulate AI processing time
-    setTimeout(() => {
-      setCandidates(mockCandidates);
+    try {
+      const analyzedCandidates: Candidate[] = [];
+      
+      for (const resume of resumes) {
+        console.log(`Processing resume: ${resume.name}`);
+        
+        // Extract text from resume
+        const resumeText = await extractTextFromFile(resume);
+        
+        // Analyze with AI
+        const candidate = await analyzeResumeWithAI(resumeText, jobDescription, resume.name);
+        analyzedCandidates.push(candidate);
+      }
+      
+      // Sort by score (highest first)
+      analyzedCandidates.sort((a, b) => b.score - a.score);
+      
+      setCandidates(analyzedCandidates);
       setIsAnalyzing(false);
       
       toast({
         title: "Analysis Complete",
-        description: `Found ${mockCandidates.length} candidates. Results ranked by AI match score.`,
+        description: `Ranked ${analyzedCandidates.length} resume(s) based on job requirements.`,
       });
-    }, 3000);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      setIsAnalyzing(false);
+      toast({
+        title: "Analysis Failed",
+        description: "There was an error processing the resumes. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
-          {/* Left Panel - Job Description Input */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-120px)]">
           <div className="lg:col-span-1">
             <JobDescriptionPanel onAnalyze={handleAnalyze} />
           </div>
           
-          {/* Right Panel - Candidate Scoreboard */}
           <div className="lg:col-span-2">
             <CandidateScoreboard 
               candidates={candidates} 

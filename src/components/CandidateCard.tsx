@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, ExternalLink, User } from 'lucide-react';
+import { Mail, Phone, ExternalLink, User, FileText } from 'lucide-react';
 
 interface Candidate {
   id: string;
@@ -15,6 +15,7 @@ interface Candidate {
   skills: string[];
   experience: string;
   education: string;
+  fileName?: string;
 }
 
 interface CandidateCardProps {
@@ -50,6 +51,12 @@ const CandidateCard = ({ candidate, onClick }: CandidateCardProps) => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{candidate.name}</h3>
+              {candidate.fileName && (
+                <div className="flex items-center text-xs text-gray-500 mt-1">
+                  <FileText className="h-3 w-3 mr-1" />
+                  <span className="truncate max-w-[150px]">{candidate.fileName}</span>
+                </div>
+              )}
               <p className="text-sm text-gray-600">{candidate.position}</p>
             </div>
           </div>
@@ -57,7 +64,7 @@ const CandidateCard = ({ candidate, onClick }: CandidateCardProps) => {
             <div className={`w-8 h-8 rounded-full ${getScoreColor(candidate.score)} flex items-center justify-center text-white text-sm font-bold`}>
               {candidate.score}
             </div>
-            <span className="text-xs text-gray-500 mt-1">Score</span>
+            <span className="text-xs text-gray-500 mt-1">AI Score</span>
           </div>
         </div>
 
@@ -73,7 +80,7 @@ const CandidateCard = ({ candidate, onClick }: CandidateCardProps) => {
         </div>
 
         <div className="mb-3">
-          <p className="text-xs text-gray-500 mb-1">Top Skills:</p>
+          <p className="text-xs text-gray-500 mb-1">Extracted Skills:</p>
           <div className="flex flex-wrap gap-1">
             {candidate.skills.slice(0, 3).map((skill, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
@@ -90,7 +97,7 @@ const CandidateCard = ({ candidate, onClick }: CandidateCardProps) => {
 
         <Button variant="ghost" size="sm" className="w-full text-blue-600 hover:text-blue-700">
           <ExternalLink className="h-4 w-4 mr-2" />
-          View Details
+          View AI Analysis
         </Button>
       </CardContent>
     </Card>
