@@ -105,15 +105,15 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           {/* Left Panel - Job Description Input */}
-          <div className="space-y-6">
+          <div className="lg:col-span-1">
             <JobDescriptionPanel onAnalyze={handleAnalyze} />
           </div>
           
           {/* Right Panel - Candidate Scoreboard */}
-          <div className="space-y-6">
+          <div className="lg:col-span-2">
             <CandidateScoreboard 
               candidates={candidates} 
               isAnalyzing={isAnalyzing}
