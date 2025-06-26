@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-12">
+        <div className="flex justify-center items-center h-12">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -13,14 +13,6 @@ const Header = () => {
               </h1>
             </div>
           </div>
-          
-          <nav className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-6">
-              <a href="#" className="text-gray-900 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Home
-              </a>
-            </div>
-          </nav>
         </div>
       </div>
       
